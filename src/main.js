@@ -19,7 +19,6 @@ const app = new App({
 
   app.message(async function ({ message, say }) {
     const text = message.text;
-    console.log(text);
     await dbClient.collection("messages").insertOne(message);
   });
 
