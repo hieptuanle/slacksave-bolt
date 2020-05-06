@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { App } from "@slack/bolt";
 import { DBClient } from "./db";
+import { Server } from "./server";
 
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -14,8 +15,12 @@ const app = new App({
   const dbClient = new DBClient();
   await dbClient.connect();
 
+  const server = new Server(dbClient);
+
   const port = process.env.PORT;
   await app.start(port || 3000);
+
+  server.app.listen(process.env.EXPRESS_PORT || 3020);
 
   app.message(async function ({ message, say }) {
     const text = message.text;
