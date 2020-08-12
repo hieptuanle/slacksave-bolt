@@ -1,6 +1,7 @@
 import "dotenv/config";
 import { App } from "@slack/bolt";
 import { DBClient } from "./db";
+import moment from "moment";
 
 const app = new App({
   signingSecret: process.env.SLACK_SIGNING_SECRET,
@@ -19,7 +20,12 @@ const app = new App({
 
   app.message(async function ({ message, say }) {
     const text = message.text;
-    await dbClient.collection("messages").insertOne(message);
+    await dbClient
+      .collection("messages")
+      .insertOne({
+        ...message,
+        created: moment.unix(message.event_ts).toDate(),
+      });
   });
 
   console.log(`⚡ Slack Save is running and listen on port ${port}`);
